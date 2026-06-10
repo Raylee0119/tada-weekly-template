@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaDa Weekly Report — Nina</title>
+<style>
+  :root{
+    --orange:#F97316; --orange-dark:#EA6C0A; --navy:#0F172A;
+    --muted:#6B7280; --line:#E2E8F0;
+    --green:#10B981; --amber:#F59E0B; --red:#EF4444;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+    color:#111827; background:#E5E7EB; font-size:13px;}
+
+  /* ── Toolbar (hidden on print) ── */
+  .toolbar{position:sticky; top:0; z-index:50; background:var(--navy); color:#fff;
+    padding:12px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 10px rgba(0,0,0,.3);}
+  .toolbar .t-logo{font-weight:800; font-size:16px; color:var(--orange);}
+  .toolbar .hint{font-size:12px; color:#94A3B8; margin-left:auto;}
+  .btn{border:none; border-radius:7px; padding:9px 16px; font-size:13px; font-weight:700;
+    cursor:pointer; color:#fff;}
+  .btn-add{background:#334155;}
+  .btn-add:hover{background:#475569;}
+  .btn-pdf{background:var(--orange);}
+  .btn-pdf:hover{background:var(--orange-dark);}
+
+  /* ── A4 sheet ── */
+  .sheet{width:210mm; min-height:297mm; margin:18px auto; background:#fff;
+    box-shadow:0 4px 24px rgba(0,0,0,.18);}
+
+  /* ── Cover (white + orange accents) ── */
+  .cover{width:210mm; height:297mm; position:relative; overflow:hidden;
+    background:#fff; color:var(--navy);
+    display:flex; flex-direction:column; justify-content:center; padding:0 30mm 0 44mm;}
+  .cover::before{content:""; position:absolute; left:0; top:0; bottom:0; width:16mm;
+    background:linear-gradient(180deg, var(--orange) 0%, var(--orange-dark) 100%);}
+  .cover::after{content:""; position:absolute; top:-72mm; right:-72mm; width:175mm; height:175mm;
+    background:rgba(249,115,22,.07); border-radius:50%;}
+  .cv-by{font-size:14px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); position:relative;}
+  .cv-logo{font-size:31px; font-weight:800; color:var(--orange); position:relative; margin-top:8px;}
+  .cv-rule{width:72px; height:6px; background:var(--orange); border-radius:3px; margin:24px 0 28px; position:relative;}
+  .cv-title{font-size:54px; font-weight:800; color:var(--navy); line-height:1.04; letter-spacing:1px; position:relative;}
+  .cv-name{font-size:24px; font-weight:700; color:var(--orange); margin-top:18px; position:relative;}
+  .cv-week{font-size:16px; margin-top:38px; color:#475569; position:relative;}
+  .cv-foot{position:absolute; bottom:24mm; left:44mm; right:30mm; display:flex;
+    justify-content:space-between; font-size:12px; color:var(--muted);
+    border-top:2px solid var(--orange); padding-top:12px;}
+
+  /* ── Content page ── */
+  .content{padding:22mm 20mm 24mm;}
+  .page-head{display:flex; align-items:center; justify-content:space-between;
+    border-bottom:3px solid var(--orange); padding-bottom:10px; margin-bottom:8px;}
+  .ph-left{font-size:22px; font-weight:800; color:var(--navy);}
+  .ph-left .brand{color:var(--orange);}
+  .ph-right{font-size:12px; color:var(--muted); text-align:right;}
+  .block-title{font-size:16px; font-weight:800; color:var(--navy); margin:16px 0 22px;
+    display:flex; align-items:center; gap:8px;}
+  .block-title::before{content:""; width:6px; height:20px; background:var(--orange); border-radius:3px;}
+  .block-tip{font-size:12px; color:var(--muted); font-style:italic; margin:0 0 12px 14px;}
+
+  /* ── Client block ── */
+  .client{border:1px solid var(--line); border-left:4px solid var(--orange); border-radius:8px;
+    padding:13px 16px; margin-bottom:12px; background:#FFFDFB; position:relative;}
+  .c-head{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .c-name{font-weight:800; font-size:16px; color:var(--navy); flex:1;}
+  .c-status{font-size:11px; font-weight:700; border:none; border-radius:12px; padding:4px 10px;
+    background:#FEF3C7; color:#92400E; cursor:pointer;}
+  .c-points{list-style:none; margin:10px 0 0;}
+  .c-points li{font-size:13px; line-height:1.55; color:#374151; padding-left:16px;
+    position:relative; margin-bottom:5px;}
+  .c-points li::before{content:""; position:absolute; left:2px; top:7px; width:6px; height:6px;
+    border-radius:50%; background:var(--orange);}
+  .del{position:absolute; top:8px; right:10px; border:none; background:transparent;
+    color:#CBD5E1; font-size:16px; cursor:pointer; line-height:1;}
+  .del:hover{color:var(--red);}
+
+  /* ── Editable field hints ── */
+  [contenteditable]{outline:none;}
+  [contenteditable]:focus{background:rgba(249,115,22,.07);}
+  [contenteditable]:empty:before{content:attr(data-ph); color:#C4C9D2; font-weight:400;}
+  .cv-by span, .cv-name span, .cv-week span, .cv-foot span span,
+  .ph-left span[contenteditable], .ph-right, .c-name{display:inline-block; min-width:90px;}
+  .cv-week span{min-width:210px;}
+  .c-name{min-width:170px;}
+  .c-points li:empty::after{content:attr(data-ph); color:#C4C9D2; font-weight:400;}
+  .foot{margin-top:26px; padding-top:12px; border-top:1px solid var(--line);
+    font-size:10.5px; color:#9CA3AF; text-align:center;}
+
+  /* ── On-screen editable underlines (gone on print) ── */
+  @media screen{
+    .content [contenteditable]{border-bottom:1px dashed var(--line);}
+    .c-points li{border-bottom:1px dashed #F1F5F9;}
+  }
+
+  /* ── Print / Export PDF ── */
+  @page{size:A4; margin:0;}
+  @media print{
+    /* 強制保留所有品牌色與背景(橘點、橘條、狀態標籤),不靠使用者勾「背景圖形」 */
+    *, *::before, *::after{
+      -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;}
+    body{background:#fff;}
+    .toolbar, .del, .add-client-row{display:none !important;}
+    .sheet{box-shadow:none; margin:0; width:auto; min-height:0;}
+    .cover{page-break-after:always;}
+    .client{page-break-inside:avoid;}
+    [contenteditable]:empty:before{content:"";}
+    .c-points li:empty::after{content:"";}
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="t-logo">TaDa Weekly Template</span>
+  <button class="btn btn-add" onclick="addClient()">＋ Add Client</button>
+  <button class="btn btn-pdf" onclick="window.print()">🖨 Export PDF</button>
+  <span class="hint">Click any field to type → press “Export PDF” → choose “Save as PDF”.</span>
+</div>
+
+<!-- ════════ Cover ════════ -->
+<div class="sheet">
+  <div class="cover">
+    <div class="cv-logo">TaDa Gaming</div>
+    <div class="cv-rule"></div>
+    <div class="cv-title">WEEKLY<br>REPORT</div>
+    <div class="cv-name">Business Development · <span contenteditable="true" data-ph="Name">Nina</span></div>
+    <div class="cv-week">Report Period&nbsp;&nbsp; <span contenteditable="true" data-ph="2026-06-08 – 2026-06-14"></span></div>
+    <div class="cv-foot">
+      <span>TaDa Gaming · Business Development</span>
+      <span>Date <span contenteditable="true" data-ph="YYYY-MM-DD"></span></span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ Client Highlights ════════ -->
+<div class="sheet">
+  <div class="content">
+    <div class="page-head">
+      <div class="ph-left"><span class="brand">TaDa</span> Weekly Report — <span contenteditable="true" data-ph="Name">Nina</span></div>
+      <div class="ph-right" contenteditable="true" data-ph="2026-06-08 – 2026-06-14"></div>
+    </div>
+
+    <div class="block-title">Client Highlights</div>
+
+    <div id="clientList">
+      <div class="client">
+        <button class="del" onclick="this.closest('.client').remove()" title="Remove this client">✕</button>
+        <div class="c-head">
+          <span class="c-name" contenteditable="true" data-ph="Client / Project name"></span>
+          <select class="c-status" onchange="colorStatus(this)">
+            <option value="amber">In Progress</option>
+            <option value="amber">Pending Feedback</option>
+            <option value="green">Done / Confirmed</option>
+            <option value="red">Stuck / Blocked</option>
+          </select>
+        </div>
+        <ul class="c-points" contenteditable="true">
+          <li data-ph="Key point 1 (press Enter for the next)"></li>
+          <li></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="add-client-row" style="margin-top:6px;">
+      <button class="btn btn-add" onclick="addClient()" style="background:#F1F5F9;color:#475569;">＋ Add another client</button>
+    </div>
+
+    <div class="foot">TaDa Gaming · Business Development · Weekly Report Template</div>
+  </div>
+</div>
+
+<script>
+  function colorStatus(sel){
+    var map = {amber:['#FEF3C7','#92400E'], green:['#D1FAE5','#065F46'], red:['#FEE2E2','#991B1B']};
+    var c = map[sel.value] || map.amber;
+    sel.style.background = c[0]; sel.style.color = c[1];
+  }
+  function addClient(){
+    var tpl = document.querySelector('#clientList .client');
+    var clone = tpl.cloneNode(true);
+    clone.querySelector('.c-name').textContent = '';
+    clone.querySelector('.c-points').innerHTML =
+      '<li data-ph="Key point 1 (press Enter for the next)"></li><li></li>';
+    clone.querySelector('.c-status').selectedIndex = 0;
+    colorStatus(clone.querySelector('.c-status'));
+    document.getElementById('clientList').appendChild(clone);
+    clone.querySelector('.c-name').focus();
+  }
+  document.querySelectorAll('.c-status').forEach(colorStatus);
+</script>
+</body>
+</html>
