@@ -115,8 +115,8 @@
 <div class="toolbar">
   <span class="t-logo">TaDa Weekly Template</span>
   <button class="btn btn-add" onclick="addClient()">＋ Add Client</button>
-  <button class="btn btn-pdf" onclick="window.print()">🖨 Export PDF</button>
-  <span class="hint">Click any field to type → press “Export PDF” → choose “Save as PDF”.</span>
+  <button class="btn btn-pdf" onclick="exportPDF()">🖨 Export PDF</button>
+  <span class="hint">Click any field to type → press “Export PDF” → choose “Save as PDF”, then save it into your Google Drive folder.</span>
 </div>
 
 <!-- ════════ Cover ════════ -->
@@ -189,6 +189,18 @@
     clone.querySelector('.c-name').focus();
   }
   document.querySelectorAll('.c-status').forEach(colorStatus);
+
+  // 匯出前自動把檔名設成 "TaDa Weekly Meeting - 姓名 - 會議日期"
+  // (瀏覽器「另存為 PDF」會用 document.title 當預設檔名)
+  function exportPDF(){
+    var name = (document.querySelector('.cv-name [contenteditable]') || {}).textContent || '';
+    var date = (document.querySelector('.cv-week [contenteditable]') || {}).textContent || '';
+    var parts = ['TaDa Weekly Meeting'];
+    if (name.trim()) parts.push(name.trim());
+    if (date.trim()) parts.push(date.trim());
+    document.title = parts.join(' - ');
+    window.print();
+  }
 </script>
 </body>
 </html>
